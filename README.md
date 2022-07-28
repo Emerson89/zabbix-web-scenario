@@ -29,7 +29,7 @@ Será solicitado a senha
 
 # Funcionamento do script
 
-O script irá verificar se existe um host e grupo de host chamado "Monitoramento URL" caso não irá criar estás variáveis podem ser mudadas no script, cada url recebe seu aplication e trigger a nível disaster em caso de falha maior que 3 
+O script irá verificar se existe um host e grupo de host chamado "Monitoramento URL" caso não irá criar, essas variáveis podem ser modificadas no script, cada url recebe seu aplication e trigger a nível disaster em caso de falha maior que 3 
 
 ## License
 GPLv3
