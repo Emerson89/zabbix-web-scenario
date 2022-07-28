@@ -15,9 +15,11 @@ pip3 install -r requirements.txt
 
 No arquivo urls.csv insira as urls que serão monitoradas conforme abaixo
 
+```
 https://url.com
 https://url2.com
 https://url3.com
+```
 
 # Execução do script
 ```
