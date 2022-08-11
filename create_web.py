@@ -6,13 +6,14 @@ from zabbix_api import ZabbixAPI,Already_Exists
 import csv
 import sys
 import getpass
+import ssl
 
 URL = sys.argv[1]
 USERNAME = sys.argv[2]
 PASSWORD = getpass.getpass("Digite a senha: ")
 
 try:
-    zapi = ZabbixAPI(URL, timeout=15)
+    zapi = ZabbixAPI(URL, timeout=15, validate_certs=False)
     zapi.login(USERNAME, PASSWORD)
     print(f'Conectado na API do Zabbix, Versao Atual {zapi.api_version()}')
     print ()
@@ -63,21 +64,26 @@ hostids = zapi.host.get({
 def create_web(step):         
         try:
            nome = "Web Check " + step
-           try:
-            a = zapi.application.get({"output": 'extend',
-                                "hostid": hostids, 
-                                "filter":{'name': "Web Check " +step}
-                                })[0]['applicationid']
-           except Exception as IndexError: 
-            app = zapi.application.create({"name": "Web Check " +step,
-                                "hostid": hostids})
+           version = zapi.api_version()
+           version.split(".")
+           a = version.split(".")
+           versao = a[0]
+           if versao <= '5':
+            try:
+             a = zapi.application.get({"output": 'extend',
+                                 "hostid": hostids, 
+                                 "filter":{'name': "Web Check " +step}
+                                 })[0]['applicationid']
+            except Exception as IndexError: 
+             app = zapi.application.create({"name": "Web Check " +step,
+                                 "hostid": hostids})
 
-            a = zapi.application.get({"output": 'extend',
-                                "hostid": hostids, 
-                                "filter":{'name': "Web Check " +step}
-                                })[0]['applicationid']
+             a = zapi.application.get({"output": 'extend',
+                                 "hostid": hostids, 
+                                 "filter":{'name': "Web Check " +step}
+                                 })[0]['applicationid']
 
-           create_web = zapi.httptest.create({
+            create_web = zapi.httptest.create({
               "name": "Web Check "+ step,
               "hostid": hostids,
               "applicationid": a,
@@ -89,11 +95,35 @@ def create_web(step):
                    "no": 1
                }
               ]
-           })
-           
-           trigger = zapi.trigger.create({"description": "Failed step of scenario URL: " + step,
+            })
+            
+            trigger = zapi.trigger.create({"description": "Failed step of scenario URL: " + step,
                                 "expression": "{"+hostname+":web.test.fail["+nome+"].sum(#3)}>=3",
                                 "hostid": hostids,
+                                "priority": 5})
+
+           elif versao >= "6":
+            create_web = zapi.httptest.create({
+              "name": "Web Check "+ step,
+              "hostid": hostids,
+              "tags": [
+                {
+                  "tag": "Web Check",
+                  "value": step
+                }
+              ],
+              "steps": [
+               {
+                   "name": nome,
+                   "url": step,
+                   "status_codes": "200",
+                   "no": 1
+               }
+              ]
+            })
+
+           trigger = zapi.trigger.create({"description": "Failed step of scenario URL: " + step,
+                                "expression": "sum(/"+hostname+"/web.test.fail["+nome+"],#3)>=3",
                                 "priority": 5})
            
            print(f'URL(s) cadastrada {r}')
