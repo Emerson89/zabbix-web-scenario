@@ -6,7 +6,6 @@ from zabbix_api import ZabbixAPI,Already_Exists
 import csv
 import sys
 import getpass
-import ssl
 
 URL = sys.argv[1]
 USERNAME = sys.argv[2]
@@ -68,6 +67,7 @@ def create_web(step):
            version.split(".")
            a = version.split(".")
            versao = a[0]
+           print(versao)
            if versao <= '5':
             try:
              a = zapi.application.get({"output": 'extend',
@@ -99,7 +99,6 @@ def create_web(step):
             
             trigger = zapi.trigger.create({"description": "Failed step of scenario URL: " + step,
                                 "expression": "{"+hostname+":web.test.fail["+nome+"].sum(#3)}>=3",
-                                "hostid": hostids,
                                 "priority": 5})
 
            elif versao >= "6":
@@ -122,7 +121,7 @@ def create_web(step):
               ]
             })
 
-           trigger = zapi.trigger.create({"description": "Failed step of scenario URL: " + step,
+            trigger = zapi.trigger.create({"description": "Failed step of scenario URL: " + step,
                                 "expression": "sum(/"+hostname+"/web.test.fail["+nome+"],#3)>=3",
                                 "priority": 5})
            
