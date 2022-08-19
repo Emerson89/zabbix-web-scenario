@@ -67,7 +67,6 @@ def create_web(step):
            version.split(".")
            a = version.split(".")
            versao = a[0]
-           print(versao)
            if versao <= '5':
             try:
              a = zapi.application.get({"output": 'extend',
