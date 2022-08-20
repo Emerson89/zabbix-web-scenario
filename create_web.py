@@ -19,7 +19,7 @@ try:
 except Exception as err:
     print(f'Falha ao conectar na API do zabbix, erro: {err}')
 
-hostname = 'Monitoramento URL'
+hostname = sys.argv[3]
 group = 'Monitoramento URL'
 
 h = zapi.host.get({
@@ -29,12 +29,13 @@ hg = zapi.hostgroup.get({
     "filter": {'name': [group]}
 })
 
-if not h:
- if not hg:
-  zapi.hostgroup.create({"name": group})   
+if not hg:
+  hg = zapi.hostgroup.create({"name": group})   
+
+elif not h:
   hg = zapi.hostgroup.get({
     "filter": {"host": [group]},
-  })[0]['groupid']
+  })[0]['groupid']    
   zapi.host.create({
      "groups": [{ "groupid": hg}],
      "host": hostname,
@@ -65,8 +66,8 @@ def create_web(step):
            nome = "Web Check " + step
            version = zapi.api_version()
            version.split(".")
-           a = version.split(".")
-           versao = a[0]
+           v = version.split(".")
+           versao = v[0]
            if versao <= '5':
             try:
              a = zapi.application.get({"output": 'extend',
