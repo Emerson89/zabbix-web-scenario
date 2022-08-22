@@ -29,10 +29,10 @@ hg = zapi.hostgroup.get({
     "filter": {'name': [group]}
 })
 
-if not hg:
+if hg == []:
   hg = zapi.hostgroup.create({"name": group})   
 
-elif not h:
+elif h == []:
   hg = zapi.hostgroup.get({
     "filter": {"host": [group]},
   })[0]['groupid']    
