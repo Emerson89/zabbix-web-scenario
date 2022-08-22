@@ -27,15 +27,12 @@ h = zapi.host.get({
 })
 hg = zapi.hostgroup.get({
     "filter": {'name': [group]}
-})
+})[0]['groupid']
 
 if hg == []:
   hg = zapi.hostgroup.create({"name": group})   
 
 elif h == []:
-  hg = zapi.hostgroup.get({
-    "filter": {"host": [group]},
-  })[0]['groupid']    
   zapi.host.create({
      "groups": [{ "groupid": hg}],
      "host": hostname,
