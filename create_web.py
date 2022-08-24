@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 # Autor: Emerson Cesario
-# E-mail: emerson.cesario50@gmail.com
 
 from zabbix_api import ZabbixAPI,Already_Exists
 import csv
@@ -25,15 +24,19 @@ group = 'Monitoramento URL'
 h = zapi.host.get({
     "filter": {"host": [hostname]},
 })
+
 hg = zapi.hostgroup.get({
     "filter": {'name': [group]}
-})[0]['groupid']
+})
 
 if hg == []:
   hg = zapi.hostgroup.create({"name": group})   
 
-elif h == []:
-  zapi.host.create({
+if h == []:
+  hg = zapi.hostgroup.get({
+    "filter": {'name': [group]}
+  })[0]['groupid']
+  hosts = zapi.host.create({
      "groups": [{ "groupid": hg}],
      "host": hostname,
      "proxy_hostid": "0",
@@ -53,12 +56,12 @@ elif h == []:
   })   
 
 hostids = zapi.host.get({
-    "output": "extend",
-    "filter": {"host": [hostname]},
-    "selectHosts": ["hostid", "host"]
-    })[0]['hostid']
+      "output": "extend",
+      "filter": {"host": [hostname]},
+      "selectHosts": ["hostid", "host"]
+      })[0]['hostid']
 
-def create_web(step):         
+def create_web(step):                
         try:
            nome = "Web Check " + step
            version = zapi.api_version()
