@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/local/bin/python3.10
 # Autor: Emerson Cesario
 
 from zabbix_api import ZabbixAPI,Already_Exists
@@ -122,6 +122,7 @@ def create_web(step):
             })
 
             trigger = zapi.trigger.create({"description": "Failed step of scenario URL: " + step,
+                                "event_name": "Monitoramento Web Check",
                                 "expression": "sum(/"+hostname+"/web.test.fail["+nome+"],#3)>=3",
                                 "priority": 5})
            
